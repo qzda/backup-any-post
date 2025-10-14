@@ -1,5 +1,6 @@
 {
   "name": "backup-any-post",
+  "displayName": "Backup Any Post",
   "description": "",
   "version": "0.0.1",
   "type": "module",
@@ -15,9 +16,12 @@
     "post"
   ],
   "dependencies": {
-    "@qzda/prolog": "latest"
+    "@qzda/prolog": "latest",
+    "turndown": "^7.2.1"
   },
   "devDependencies": {
-    "@types/tampermonkey": "latest"
+    "@types/node": "^24.7.2",
+    "@types/tampermonkey": "latest",
+    "@types/turndown": "^5.0.5"
   }
 }

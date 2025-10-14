@@ -1,28 +1,101 @@
-import { DownloadIcon } from '../assets/svg'
-import { name } from '../package.json'
+import { svgIcon } from "../assets/svg";
+import { name, displayName } from "../package.json";
+import { devLog } from "../utils/log";
+import { htmlToMd, writeText } from "../utils/backup";
 
 export function zhihuScript(url: string) {
-  const _url = new URL(url)
+  const _url = new URL(url);
+
+  function backup(e: PointerEvent) {
+    const rochTextDom = (e.target as HTMLElement)
+      .closest<HTMLDivElement>("div.Card.TopstoryItem")
+      ?.querySelector<HTMLSpanElement>("span.RichText");
+
+    if (rochTextDom) {
+      const md = htmlToMd(rochTextDom);
+
+      /// 获取 文章mata
+      const title = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem-title meta[itemprop="name"]')
+        ?.getAttribute("content");
+      const titleUrl = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem-title meta[itemprop="url"]')
+        ?.getAttribute("content");
+      // <meta itemprop="url" content="https://www.zhihu.com/question/questionID/answer/answerID">
+      const url = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="url"]')
+        ?.getAttribute("content");
+      // 2025-10-11T13:21:31.000Z
+      const dateCreated = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="dateCreated"]')
+        ?.getAttribute("content");
+      // 2025-10-11T13:21:31.000Z
+      const dateModified = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="dateModified"]')
+        ?.getAttribute("content");
+      const upvoteCount = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="upvoteCount"]')
+        ?.getAttribute("content");
+      const commentCount = rochTextDom
+        .closest<HTMLDivElement>("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="commentCount"]')
+        ?.getAttribute("content");
+
+      const metaMd = [
+        title && titleUrl && `# [${title}](${titleUrl})`,
+        dateCreated && `- 创建时间：${new Date(dateCreated).toLocaleString()}`,
+        dateModified &&
+          `- 修改时间：${new Date(dateModified).toLocaleString()}`,
+        upvoteCount && `- 赞同：${upvoteCount}`,
+        commentCount && `- 评论：${commentCount}`,
+        url && `- 链接：[${url}](${url})`,
+        "\n\n",
+      ];
+
+      const _md = metaMd.filter((i) => Boolean(i)).join("\n") + md;
+
+      devLog(`md\n\n${_md}`);
+
+      writeText(_md).then(() => {
+        alert(`${displayName} \n\n✅复制节点成功`);
+      });
+    } else {
+      devLog("e.target", e.target);
+      alert(`${displayName} \n\n❌获取节点失败`);
+    }
+  }
 
   switch (_url.pathname) {
-    case '/':
-    case '/follow':
-      const posts = document.querySelectorAll('.Card.TopstoryItem')
-      posts.forEach(post => {
-        const content = post.querySelector('.ContentItem-actions')
-        if (content && content?.innerHTML && !content.innerHTML.includes(DownloadIcon)) {
-          const className = content.querySelector('button.ContentItem-action')?.className
+    case "/":
+    case "/follow":
+      const posts = document.querySelectorAll(
+        ".RichContent:not(.is-collapsed)"
+      );
+      posts.forEach((post) => {
+        const content = post.querySelector<HTMLDivElement>(
+          ".ContentItem-actions"
+        );
+        // '.RichContent:not(.is-collapsed)'
+        if (content && !content.innerHTML.includes(`${name}--btn`)) {
+          const btn = document.createElement("button");
+          btn.className = `${name}--btn`;
+          btn.style.flex = "1";
+          btn.style.display = "flex";
+          btn.style.justifyContent = "flex-end";
+          btn.style.alignItems = "center";
 
-          const btn = `
-            <button aria-live="polite" type="button" class="${className}" style="display: flex; align-items: center;">
-              <span style="display: inline-flex; align-items: center; margin-right: 4px">
-                ${DownloadIcon}
-              </span>${name.split('-').map(i => `${i[0].toUpperCase()}${i.slice(1)}`).join(' ')}
-            </button>`
+          btn.innerHTML = `${svgIcon} ${displayName}`;
 
-          content.innerHTML = content.innerHTML += btn
+          btn.onclick = backup;
+          content.appendChild(btn);
         }
-      })
+      });
       break;
 
     default:

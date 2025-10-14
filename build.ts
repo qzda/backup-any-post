@@ -3,7 +3,7 @@ import { mkdir, rm, writeFile } from "node:fs/promises";
 import process from "node:process";
 import prolog from "@qzda/prolog";
 import { name } from "./package.json";
-import { UserScriptConfig } from "./config";
+import { userScriptConfig } from "./config";
 import { isDev } from "./utils/dev";
 
 function runCommand(
@@ -58,7 +58,7 @@ async function buildUserScript() {
       : "cd ./user-script && bun build --target=browser ./index.ts "
   );
   const userScriptLines: string[] = ["// ==UserScript=="];
-  Object.entries(UserScriptConfig).map(([key, value]) => {
+  Object.entries(userScriptConfig).map(([key, value]) => {
     if (Array.isArray(value)) {
       value.forEach((v) => {
         userScriptLines.push(`// @${key} ${v}`);

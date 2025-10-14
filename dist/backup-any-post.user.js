@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Backup Any Post
-// @description 
+// @description
 // @author qzda
 // @version 0.0.1
 // @match *://*/*
@@ -8,14 +8,13 @@
 // @supportURL https://github.com/qzda/backup-any-post/issues/new
 // @downloadURL https://raw.githubusercontent.com/qzda/backup-any-post/main/dist/backup-any-post.user.js
 // @updateURL https://raw.githubusercontent.com/qzda/backup-any-post/main/dist/backup-any-post.user.js
-// @icon data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --%3E%3Cpath fill='currentColor' d='m12 18l4-4l-1.4-1.4l-1.6 1.6V10h-2v4.2l-1.6-1.6L8 14zm-7 3q-.825 0-1.412-.587T3 19V6.525q0-.35.113-.675t.337-.6L4.7 3.725q.275-.35.687-.538T6.25 3h11.5q.45 0 .863.188t.687.537l1.25 1.525q.225.275.338.6t.112.675V19q0 .825-.587 1.413T19 21zm.4-15h13.2l-.85-1H6.25z'/%3E%3C/svg%3E
+// @icon data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3C!-- Icon from Stash Icons by Pingback LLC - https://github.com/stash-ui/icons/blob/master/LICENSE --%3E%3Cpath fill='%23ffffff' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 6.2c0-1.12 0-1.68.218-2.108a2 2 0 0 1 .874-.874C7.52 3 8.08 3 9.2 3h5.6c1.12 0 1.68 0 2.108.218a2 2 0 0 1 .874.874C18 4.52 18 5.08 18 6.2v13.305c0 .486 0 .729-.101.862a.5.5 0 0 1-.37.198c-.167.01-.369-.125-.773-.394L12 17l-4.756 3.17c-.404.27-.606.405-.774.395a.5.5 0 0 1-.369-.198C6 20.234 6 19.991 6 19.505z'/%3E%3Cpath fill='%23ffffff' d='M6 6.2c0-1.12 0-1.68.218-2.108a2 2 0 0 1 .874-.874C7.52 3 8.08 3 9.2 3h5.6c1.12 0 1.68 0 2.108.218a2 2 0 0 1 .874.874C18 4.52 18 5.08 18 6.2v13.305c0 .486 0 .729-.101.862a.5.5 0 0 1-.37.198c-.167.01-.369-.125-.773-.394L12 17l-4.756 3.17c-.404.27-.606.405-.774.395a.5.5 0 0 1-.369-.198C6 20.234 6 19.991 6 19.505z' opacity='.5'/%3E%3C/svg%3E
 // @copyright MIT
 // @run-at document-start
 // @connect raw.githubusercontent.com
 // @connect github.com
 // @grant unsafeWindow
 // @grant window.onurlchange
-// @grant GM_addStyle
 // @grant GM_addElement
 // @grant GM_registerMenuCommand
 // ==/UserScript==
@@ -38,7 +37,7 @@ var Colors = {
   brightBlue: 94,
   brightMagenta: 95,
   brightCyan: 96,
-  brightWhite: 97
+  brightWhite: 97,
 };
 var Backgrounds = {
   bgBlack: 40,
@@ -57,35 +56,48 @@ var Backgrounds = {
   bgBrightBlue: 104,
   bgBrightMagenta: 105,
   bgBrightCyan: 106,
-  bgBrightWhite: 107
+  bgBrightWhite: 107,
 };
 var OtherStyles = {
   bold: 1,
   italic: 3,
-  underline: 4
+  underline: 4,
 };
-var Obj = Object.assign(Object.assign(Object.assign({}, Object.keys(Colors).reduce((_obj, color) => {
-  _obj[color] = (str) => `\x1B[${Colors[color]}m${str}\x1B[0m`;
-  return _obj;
-}, {})), Object.keys(Backgrounds).reduce((_obj, bg) => {
-  _obj[bg] = (str) => `\x1B[${Backgrounds[bg]}m${str}\x1B[0m`;
-  return _obj;
-}, {})), Object.keys(OtherStyles).reduce((_obj, style) => {
-  _obj[style] = (str) => `\x1B[${OtherStyles[style]}m${str}\x1B[0m`;
-  return _obj;
-}, {}));
+var Obj = Object.assign(
+  Object.assign(
+    Object.assign(
+      {},
+      Object.keys(Colors).reduce((_obj, color) => {
+        _obj[color] = (str) => `\x1B[${Colors[color]}m${str}\x1B[0m`;
+        return _obj;
+      }, {})
+    ),
+    Object.keys(Backgrounds).reduce((_obj, bg) => {
+      _obj[bg] = (str) => `\x1B[${Backgrounds[bg]}m${str}\x1B[0m`;
+      return _obj;
+    }, {})
+  ),
+  Object.keys(OtherStyles).reduce((_obj, style) => {
+    _obj[style] = (str) => `\x1B[${OtherStyles[style]}m${str}\x1B[0m`;
+    return _obj;
+  }, {})
+);
 var dist_default = Obj;
 
 // ../package.json
 var name = "backup-any-post";
+var displayName = "Backup Any Post";
 var version = "0.0.1";
 
 // ../utils/dev.ts
-var isDev = false;
+var isDev = true;
 
 // ../utils/log.ts
 function log(...arg) {
-  console.log(dist_default.bgBlack(dist_default.brightYellow(`${name} v${version}`)), ...arg);
+  console.log(
+    dist_default.bgBlack(dist_default.brightYellow(`${name} v${version}`)),
+    ...arg
+  );
 }
 function devLog(...arg) {
   if (isDev) {
@@ -94,26 +106,995 @@ function devLog(...arg) {
 }
 
 // ../assets/svg.ts
-var DownloadIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 18l4-4l-1.4-1.4l-1.6 1.6V10h-2v4.2l-1.6-1.6L8 14zm-7 3q-.825 0-1.412-.587T3 19V6.525q0-.35.113-.675t.337-.6L4.7 3.725q.275-.35.687-.538T6.25 3h11.5q.45 0 .863.188t.687.537l1.25 1.525q.225.275.338.6t.112.675V19q0 .825-.587 1.413T19 21zm.4-15h13.2l-.85-1H6.25z"/></svg>';
+var svgIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Stash Icons by Pingback LLC - https://github.com/stash-ui/icons/blob/master/LICENSE --><path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 6.2c0-1.12 0-1.68.218-2.108a2 2 0 0 1 .874-.874C7.52 3 8.08 3 9.2 3h5.6c1.12 0 1.68 0 2.108.218a2 2 0 0 1 .874.874C18 4.52 18 5.08 18 6.2v13.305c0 .486 0 .729-.101.862a.5.5 0 0 1-.37.198c-.167.01-.369-.125-.773-.394L12 17l-4.756 3.17c-.404.27-.606.405-.774.395a.5.5 0 0 1-.369-.198C6 20.234 6 19.991 6 19.505z"/><path fill="currentColor" d="M6 6.2c0-1.12 0-1.68.218-2.108a2 2 0 0 1 .874-.874C7.52 3 8.08 3 9.2 3h5.6c1.12 0 1.68 0 2.108.218a2 2 0 0 1 .874.874C18 4.52 18 5.08 18 6.2v13.305c0 .486 0 .729-.101.862a.5.5 0 0 1-.37.198c-.167.01-.369-.125-.773-.394L12 17l-4.756 3.17c-.404.27-.606.405-.774.395a.5.5 0 0 1-.369-.198C6 20.234 6 19.991 6 19.505z" opacity=".5"/></svg>';
+
+// ../node_modules/turndown/lib/turndown.browser.es.js
+function extend(destination) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+    for (var key in source) {
+      if (source.hasOwnProperty(key)) destination[key] = source[key];
+    }
+  }
+  return destination;
+}
+function repeat(character, count) {
+  return Array(count + 1).join(character);
+}
+function trimLeadingNewlines(string) {
+  return string.replace(/^\n*/, "");
+}
+function trimTrailingNewlines(string) {
+  var indexEnd = string.length;
+  while (
+    indexEnd > 0 &&
+    string[indexEnd - 1] ===
+      `
+`
+  )
+    indexEnd--;
+  return string.substring(0, indexEnd);
+}
+var blockElements = [
+  "ADDRESS",
+  "ARTICLE",
+  "ASIDE",
+  "AUDIO",
+  "BLOCKQUOTE",
+  "BODY",
+  "CANVAS",
+  "CENTER",
+  "DD",
+  "DIR",
+  "DIV",
+  "DL",
+  "DT",
+  "FIELDSET",
+  "FIGCAPTION",
+  "FIGURE",
+  "FOOTER",
+  "FORM",
+  "FRAMESET",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "HEADER",
+  "HGROUP",
+  "HR",
+  "HTML",
+  "ISINDEX",
+  "LI",
+  "MAIN",
+  "MENU",
+  "NAV",
+  "NOFRAMES",
+  "NOSCRIPT",
+  "OL",
+  "OUTPUT",
+  "P",
+  "PRE",
+  "SECTION",
+  "TABLE",
+  "TBODY",
+  "TD",
+  "TFOOT",
+  "TH",
+  "THEAD",
+  "TR",
+  "UL",
+];
+function isBlock(node) {
+  return is(node, blockElements);
+}
+var voidElements = [
+  "AREA",
+  "BASE",
+  "BR",
+  "COL",
+  "COMMAND",
+  "EMBED",
+  "HR",
+  "IMG",
+  "INPUT",
+  "KEYGEN",
+  "LINK",
+  "META",
+  "PARAM",
+  "SOURCE",
+  "TRACK",
+  "WBR",
+];
+function isVoid(node) {
+  return is(node, voidElements);
+}
+function hasVoid(node) {
+  return has(node, voidElements);
+}
+var meaningfulWhenBlankElements = [
+  "A",
+  "TABLE",
+  "THEAD",
+  "TBODY",
+  "TFOOT",
+  "TH",
+  "TD",
+  "IFRAME",
+  "SCRIPT",
+  "AUDIO",
+  "VIDEO",
+];
+function isMeaningfulWhenBlank(node) {
+  return is(node, meaningfulWhenBlankElements);
+}
+function hasMeaningfulWhenBlank(node) {
+  return has(node, meaningfulWhenBlankElements);
+}
+function is(node, tagNames) {
+  return tagNames.indexOf(node.nodeName) >= 0;
+}
+function has(node, tagNames) {
+  return (
+    node.getElementsByTagName &&
+    tagNames.some(function (tagName) {
+      return node.getElementsByTagName(tagName).length;
+    })
+  );
+}
+var rules = {};
+rules.paragraph = {
+  filter: "p",
+  replacement: function (content) {
+    return (
+      `
+
+` +
+      content +
+      `
+
+`
+    );
+  },
+};
+rules.lineBreak = {
+  filter: "br",
+  replacement: function (content, node, options) {
+    return (
+      options.br +
+      `
+`
+    );
+  },
+};
+rules.heading = {
+  filter: ["h1", "h2", "h3", "h4", "h5", "h6"],
+  replacement: function (content, node, options) {
+    var hLevel = Number(node.nodeName.charAt(1));
+    if (options.headingStyle === "setext" && hLevel < 3) {
+      var underline = repeat(hLevel === 1 ? "=" : "-", content.length);
+      return (
+        `
+
+` +
+        content +
+        `
+` +
+        underline +
+        `
+
+`
+      );
+    } else {
+      return (
+        `
+
+` +
+        repeat("#", hLevel) +
+        " " +
+        content +
+        `
+
+`
+      );
+    }
+  },
+};
+rules.blockquote = {
+  filter: "blockquote",
+  replacement: function (content) {
+    content = content.replace(/^\n+|\n+$/g, "");
+    content = content.replace(/^/gm, "> ");
+    return (
+      `
+
+` +
+      content +
+      `
+
+`
+    );
+  },
+};
+rules.list = {
+  filter: ["ul", "ol"],
+  replacement: function (content, node) {
+    var parent = node.parentNode;
+    if (parent.nodeName === "LI" && parent.lastElementChild === node) {
+      return (
+        `
+` + content
+      );
+    } else {
+      return (
+        `
+
+` +
+        content +
+        `
+
+`
+      );
+    }
+  },
+};
+rules.listItem = {
+  filter: "li",
+  replacement: function (content, node, options) {
+    var prefix = options.bulletListMarker + "   ";
+    var parent = node.parentNode;
+    if (parent.nodeName === "OL") {
+      var start = parent.getAttribute("start");
+      var index = Array.prototype.indexOf.call(parent.children, node);
+      prefix = (start ? Number(start) + index : index + 1) + ".  ";
+    }
+    content = content
+      .replace(/^\n+/, "")
+      .replace(
+        /\n+$/,
+        `
+`
+      )
+      .replace(
+        /\n/gm,
+        `
+` + " ".repeat(prefix.length)
+      );
+    return (
+      prefix +
+      content +
+      (node.nextSibling && !/\n$/.test(content)
+        ? `
+`
+        : "")
+    );
+  },
+};
+rules.indentedCodeBlock = {
+  filter: function (node, options) {
+    return (
+      options.codeBlockStyle === "indented" &&
+      node.nodeName === "PRE" &&
+      node.firstChild &&
+      node.firstChild.nodeName === "CODE"
+    );
+  },
+  replacement: function (content, node, options) {
+    return (
+      `
+
+    ` +
+      node.firstChild.textContent.replace(
+        /\n/g,
+        `
+    `
+      ) +
+      `
+
+`
+    );
+  },
+};
+rules.fencedCodeBlock = {
+  filter: function (node, options) {
+    return (
+      options.codeBlockStyle === "fenced" &&
+      node.nodeName === "PRE" &&
+      node.firstChild &&
+      node.firstChild.nodeName === "CODE"
+    );
+  },
+  replacement: function (content, node, options) {
+    var className = node.firstChild.getAttribute("class") || "";
+    var language = (className.match(/language-(\S+)/) || [null, ""])[1];
+    var code = node.firstChild.textContent;
+    var fenceChar = options.fence.charAt(0);
+    var fenceSize = 3;
+    var fenceInCodeRegex = new RegExp("^" + fenceChar + "{3,}", "gm");
+    var match;
+    while ((match = fenceInCodeRegex.exec(code))) {
+      if (match[0].length >= fenceSize) {
+        fenceSize = match[0].length + 1;
+      }
+    }
+    var fence = repeat(fenceChar, fenceSize);
+    return (
+      `
+
+` +
+      fence +
+      language +
+      `
+` +
+      code.replace(/\n$/, "") +
+      `
+` +
+      fence +
+      `
+
+`
+    );
+  },
+};
+rules.horizontalRule = {
+  filter: "hr",
+  replacement: function (content, node, options) {
+    return (
+      `
+
+` +
+      options.hr +
+      `
+
+`
+    );
+  },
+};
+rules.inlineLink = {
+  filter: function (node, options) {
+    return (
+      options.linkStyle === "inlined" &&
+      node.nodeName === "A" &&
+      node.getAttribute("href")
+    );
+  },
+  replacement: function (content, node) {
+    var href = node.getAttribute("href");
+    if (href) href = href.replace(/([()])/g, "\\$1");
+    var title = cleanAttribute(node.getAttribute("title"));
+    if (title) title = ' "' + title.replace(/"/g, '\\"') + '"';
+    return "[" + content + "](" + href + title + ")";
+  },
+};
+rules.referenceLink = {
+  filter: function (node, options) {
+    return (
+      options.linkStyle === "referenced" &&
+      node.nodeName === "A" &&
+      node.getAttribute("href")
+    );
+  },
+  replacement: function (content, node, options) {
+    var href = node.getAttribute("href");
+    var title = cleanAttribute(node.getAttribute("title"));
+    if (title) title = ' "' + title + '"';
+    var replacement;
+    var reference;
+    switch (options.linkReferenceStyle) {
+      case "collapsed":
+        replacement = "[" + content + "][]";
+        reference = "[" + content + "]: " + href + title;
+        break;
+      case "shortcut":
+        replacement = "[" + content + "]";
+        reference = "[" + content + "]: " + href + title;
+        break;
+      default:
+        var id = this.references.length + 1;
+        replacement = "[" + content + "][" + id + "]";
+        reference = "[" + id + "]: " + href + title;
+    }
+    this.references.push(reference);
+    return replacement;
+  },
+  references: [],
+  append: function (options) {
+    var references = "";
+    if (this.references.length) {
+      references =
+        `
+
+` +
+        this.references.join(`
+`) +
+        `
+
+`;
+      this.references = [];
+    }
+    return references;
+  },
+};
+rules.emphasis = {
+  filter: ["em", "i"],
+  replacement: function (content, node, options) {
+    if (!content.trim()) return "";
+    return options.emDelimiter + content + options.emDelimiter;
+  },
+};
+rules.strong = {
+  filter: ["strong", "b"],
+  replacement: function (content, node, options) {
+    if (!content.trim()) return "";
+    return options.strongDelimiter + content + options.strongDelimiter;
+  },
+};
+rules.code = {
+  filter: function (node) {
+    var hasSiblings = node.previousSibling || node.nextSibling;
+    var isCodeBlock = node.parentNode.nodeName === "PRE" && !hasSiblings;
+    return node.nodeName === "CODE" && !isCodeBlock;
+  },
+  replacement: function (content) {
+    if (!content) return "";
+    content = content.replace(/\r?\n|\r/g, " ");
+    var extraSpace = /^`|^ .*?[^ ].* $|`$/.test(content) ? " " : "";
+    var delimiter = "`";
+    var matches = content.match(/`+/gm) || [];
+    while (matches.indexOf(delimiter) !== -1) delimiter = delimiter + "`";
+    return delimiter + extraSpace + content + extraSpace + delimiter;
+  },
+};
+rules.image = {
+  filter: "img",
+  replacement: function (content, node) {
+    var alt = cleanAttribute(node.getAttribute("alt"));
+    var src = node.getAttribute("src") || "";
+    var title = cleanAttribute(node.getAttribute("title"));
+    var titlePart = title ? ' "' + title + '"' : "";
+    return src ? "![" + alt + "]" + "(" + src + titlePart + ")" : "";
+  },
+};
+function cleanAttribute(attribute) {
+  return attribute
+    ? attribute.replace(
+        /(\n+\s*)+/g,
+        `
+`
+      )
+    : "";
+}
+function Rules(options) {
+  this.options = options;
+  this._keep = [];
+  this._remove = [];
+  this.blankRule = {
+    replacement: options.blankReplacement,
+  };
+  this.keepReplacement = options.keepReplacement;
+  this.defaultRule = {
+    replacement: options.defaultReplacement,
+  };
+  this.array = [];
+  for (var key in options.rules) this.array.push(options.rules[key]);
+}
+Rules.prototype = {
+  add: function (key, rule) {
+    this.array.unshift(rule);
+  },
+  keep: function (filter) {
+    this._keep.unshift({
+      filter,
+      replacement: this.keepReplacement,
+    });
+  },
+  remove: function (filter) {
+    this._remove.unshift({
+      filter,
+      replacement: function () {
+        return "";
+      },
+    });
+  },
+  forNode: function (node) {
+    if (node.isBlank) return this.blankRule;
+    var rule;
+    if ((rule = findRule(this.array, node, this.options))) return rule;
+    if ((rule = findRule(this._keep, node, this.options))) return rule;
+    if ((rule = findRule(this._remove, node, this.options))) return rule;
+    return this.defaultRule;
+  },
+  forEach: function (fn) {
+    for (var i = 0; i < this.array.length; i++) fn(this.array[i], i);
+  },
+};
+function findRule(rules2, node, options) {
+  for (var i = 0; i < rules2.length; i++) {
+    var rule = rules2[i];
+    if (filterValue(rule, node, options)) return rule;
+  }
+  return;
+}
+function filterValue(rule, node, options) {
+  var filter = rule.filter;
+  if (typeof filter === "string") {
+    if (filter === node.nodeName.toLowerCase()) return true;
+  } else if (Array.isArray(filter)) {
+    if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true;
+  } else if (typeof filter === "function") {
+    if (filter.call(rule, node, options)) return true;
+  } else {
+    throw new TypeError("`filter` needs to be a string, array, or function");
+  }
+}
+function collapseWhitespace(options) {
+  var element = options.element;
+  var isBlock2 = options.isBlock;
+  var isVoid2 = options.isVoid;
+  var isPre =
+    options.isPre ||
+    function (node2) {
+      return node2.nodeName === "PRE";
+    };
+  if (!element.firstChild || isPre(element)) return;
+  var prevText = null;
+  var keepLeadingWs = false;
+  var prev = null;
+  var node = next(prev, element, isPre);
+  while (node !== element) {
+    if (node.nodeType === 3 || node.nodeType === 4) {
+      var text = node.data.replace(/[ \r\n\t]+/g, " ");
+      if (
+        (!prevText || / $/.test(prevText.data)) &&
+        !keepLeadingWs &&
+        text[0] === " "
+      ) {
+        text = text.substr(1);
+      }
+      if (!text) {
+        node = remove(node);
+        continue;
+      }
+      node.data = text;
+      prevText = node;
+    } else if (node.nodeType === 1) {
+      if (isBlock2(node) || node.nodeName === "BR") {
+        if (prevText) {
+          prevText.data = prevText.data.replace(/ $/, "");
+        }
+        prevText = null;
+        keepLeadingWs = false;
+      } else if (isVoid2(node) || isPre(node)) {
+        prevText = null;
+        keepLeadingWs = true;
+      } else if (prevText) {
+        keepLeadingWs = false;
+      }
+    } else {
+      node = remove(node);
+      continue;
+    }
+    var nextNode = next(prev, node, isPre);
+    prev = node;
+    node = nextNode;
+  }
+  if (prevText) {
+    prevText.data = prevText.data.replace(/ $/, "");
+    if (!prevText.data) {
+      remove(prevText);
+    }
+  }
+}
+function remove(node) {
+  var next = node.nextSibling || node.parentNode;
+  node.parentNode.removeChild(node);
+  return next;
+}
+function next(prev, current, isPre) {
+  if ((prev && prev.parentNode === current) || isPre(current)) {
+    return current.nextSibling || current.parentNode;
+  }
+  return current.firstChild || current.nextSibling || current.parentNode;
+}
+var root = typeof window !== "undefined" ? window : {};
+function canParseHTMLNatively() {
+  var Parser = root.DOMParser;
+  var canParse = false;
+  try {
+    if (new Parser().parseFromString("", "text/html")) {
+      canParse = true;
+    }
+  } catch (e) {}
+  return canParse;
+}
+function createHTMLParser() {
+  var Parser = function () {};
+  {
+    if (shouldUseActiveX()) {
+      Parser.prototype.parseFromString = function (string) {
+        var doc = new window.ActiveXObject("htmlfile");
+        doc.designMode = "on";
+        doc.open();
+        doc.write(string);
+        doc.close();
+        return doc;
+      };
+    } else {
+      Parser.prototype.parseFromString = function (string) {
+        var doc = document.implementation.createHTMLDocument("");
+        doc.open();
+        doc.write(string);
+        doc.close();
+        return doc;
+      };
+    }
+  }
+  return Parser;
+}
+function shouldUseActiveX() {
+  var useActiveX = false;
+  try {
+    document.implementation.createHTMLDocument("").open();
+  } catch (e) {
+    if (root.ActiveXObject) useActiveX = true;
+  }
+  return useActiveX;
+}
+var HTMLParser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
+function RootNode(input, options) {
+  var root2;
+  if (typeof input === "string") {
+    var doc = htmlParser().parseFromString(
+      '<x-turndown id="turndown-root">' + input + "</x-turndown>",
+      "text/html"
+    );
+    root2 = doc.getElementById("turndown-root");
+  } else {
+    root2 = input.cloneNode(true);
+  }
+  collapseWhitespace({
+    element: root2,
+    isBlock,
+    isVoid,
+    isPre: options.preformattedCode ? isPreOrCode : null,
+  });
+  return root2;
+}
+var _htmlParser;
+function htmlParser() {
+  _htmlParser = _htmlParser || new HTMLParser();
+  return _htmlParser;
+}
+function isPreOrCode(node) {
+  return node.nodeName === "PRE" || node.nodeName === "CODE";
+}
+function Node(node, options) {
+  node.isBlock = isBlock(node);
+  node.isCode = node.nodeName === "CODE" || node.parentNode.isCode;
+  node.isBlank = isBlank(node);
+  node.flankingWhitespace = flankingWhitespace(node, options);
+  return node;
+}
+function isBlank(node) {
+  return (
+    !isVoid(node) &&
+    !isMeaningfulWhenBlank(node) &&
+    /^\s*$/i.test(node.textContent) &&
+    !hasVoid(node) &&
+    !hasMeaningfulWhenBlank(node)
+  );
+}
+function flankingWhitespace(node, options) {
+  if (node.isBlock || (options.preformattedCode && node.isCode)) {
+    return { leading: "", trailing: "" };
+  }
+  var edges = edgeWhitespace(node.textContent);
+  if (edges.leadingAscii && isFlankedByWhitespace("left", node, options)) {
+    edges.leading = edges.leadingNonAscii;
+  }
+  if (edges.trailingAscii && isFlankedByWhitespace("right", node, options)) {
+    edges.trailing = edges.trailingNonAscii;
+  }
+  return { leading: edges.leading, trailing: edges.trailing };
+}
+function edgeWhitespace(string) {
+  var m = string.match(
+    /^(([ \t\r\n]*)(\s*))(?:(?=\S)[\s\S]*\S)?((\s*?)([ \t\r\n]*))$/
+  );
+  return {
+    leading: m[1],
+    leadingAscii: m[2],
+    leadingNonAscii: m[3],
+    trailing: m[4],
+    trailingNonAscii: m[5],
+    trailingAscii: m[6],
+  };
+}
+function isFlankedByWhitespace(side, node, options) {
+  var sibling;
+  var regExp;
+  var isFlanked;
+  if (side === "left") {
+    sibling = node.previousSibling;
+    regExp = / $/;
+  } else {
+    sibling = node.nextSibling;
+    regExp = /^ /;
+  }
+  if (sibling) {
+    if (sibling.nodeType === 3) {
+      isFlanked = regExp.test(sibling.nodeValue);
+    } else if (options.preformattedCode && sibling.nodeName === "CODE") {
+      isFlanked = false;
+    } else if (sibling.nodeType === 1 && !isBlock(sibling)) {
+      isFlanked = regExp.test(sibling.textContent);
+    }
+  }
+  return isFlanked;
+}
+var reduce = Array.prototype.reduce;
+var escapes = [
+  [/\\/g, "\\\\"],
+  [/\*/g, "\\*"],
+  [/^-/g, "\\-"],
+  [/^\+ /g, "\\+ "],
+  [/^(=+)/g, "\\$1"],
+  [/^(#{1,6}) /g, "\\$1 "],
+  [/`/g, "\\`"],
+  [/^~~~/g, "\\~~~"],
+  [/\[/g, "\\["],
+  [/\]/g, "\\]"],
+  [/^>/g, "\\>"],
+  [/_/g, "\\_"],
+  [/^(\d+)\. /g, "$1\\. "],
+];
+function TurndownService(options) {
+  if (!(this instanceof TurndownService)) return new TurndownService(options);
+  var defaults = {
+    rules,
+    headingStyle: "setext",
+    hr: "* * *",
+    bulletListMarker: "*",
+    codeBlockStyle: "indented",
+    fence: "```",
+    emDelimiter: "_",
+    strongDelimiter: "**",
+    linkStyle: "inlined",
+    linkReferenceStyle: "full",
+    br: "  ",
+    preformattedCode: false,
+    blankReplacement: function (content, node) {
+      return node.isBlock
+        ? `
+
+`
+        : "";
+    },
+    keepReplacement: function (content, node) {
+      return node.isBlock
+        ? `
+
+` +
+            node.outerHTML +
+            `
+
+`
+        : node.outerHTML;
+    },
+    defaultReplacement: function (content, node) {
+      return node.isBlock
+        ? `
+
+` +
+            content +
+            `
+
+`
+        : content;
+    },
+  };
+  this.options = extend({}, defaults, options);
+  this.rules = new Rules(this.options);
+}
+TurndownService.prototype = {
+  turndown: function (input) {
+    if (!canConvert(input)) {
+      throw new TypeError(
+        input + " is not a string, or an element/document/fragment node."
+      );
+    }
+    if (input === "") return "";
+    var output = process.call(this, new RootNode(input, this.options));
+    return postProcess.call(this, output);
+  },
+  use: function (plugin) {
+    if (Array.isArray(plugin)) {
+      for (var i = 0; i < plugin.length; i++) this.use(plugin[i]);
+    } else if (typeof plugin === "function") {
+      plugin(this);
+    } else {
+      throw new TypeError("plugin must be a Function or an Array of Functions");
+    }
+    return this;
+  },
+  addRule: function (key, rule) {
+    this.rules.add(key, rule);
+    return this;
+  },
+  keep: function (filter) {
+    this.rules.keep(filter);
+    return this;
+  },
+  remove: function (filter) {
+    this.rules.remove(filter);
+    return this;
+  },
+  escape: function (string) {
+    return escapes.reduce(function (accumulator, escape) {
+      return accumulator.replace(escape[0], escape[1]);
+    }, string);
+  },
+};
+function process(parentNode) {
+  var self = this;
+  return reduce.call(
+    parentNode.childNodes,
+    function (output, node) {
+      node = new Node(node, self.options);
+      var replacement = "";
+      if (node.nodeType === 3) {
+        replacement = node.isCode
+          ? node.nodeValue
+          : self.escape(node.nodeValue);
+      } else if (node.nodeType === 1) {
+        replacement = replacementForNode.call(self, node);
+      }
+      return join(output, replacement);
+    },
+    ""
+  );
+}
+function postProcess(output) {
+  var self = this;
+  this.rules.forEach(function (rule) {
+    if (typeof rule.append === "function") {
+      output = join(output, rule.append(self.options));
+    }
+  });
+  return output.replace(/^[\t\r\n]+/, "").replace(/[\t\r\n\s]+$/, "");
+}
+function replacementForNode(node) {
+  var rule = this.rules.forNode(node);
+  var content = process.call(this, node);
+  var whitespace = node.flankingWhitespace;
+  if (whitespace.leading || whitespace.trailing) content = content.trim();
+  return (
+    whitespace.leading +
+    rule.replacement(content, node, this.options) +
+    whitespace.trailing
+  );
+}
+function join(output, replacement) {
+  var s1 = trimTrailingNewlines(output);
+  var s2 = trimLeadingNewlines(replacement);
+  var nls = Math.max(output.length - s1.length, replacement.length - s2.length);
+  var separator = `
+
+`.substring(0, nls);
+  return s1 + separator + s2;
+}
+function canConvert(input) {
+  return (
+    input != null &&
+    (typeof input === "string" ||
+      (input.nodeType &&
+        (input.nodeType === 1 ||
+          input.nodeType === 9 ||
+          input.nodeType === 11)))
+  );
+}
+var turndown_browser_es_default = TurndownService;
+
+// ../utils/backup.ts
+function htmlToMd(dom) {
+  const turndownService = new turndown_browser_es_default();
+  const md = turndownService.turndown(dom.innerHTML);
+  devLog(`htmlToMd
+
+${md}`);
+  return md;
+}
+function writeText(text) {
+  return navigator.clipboard.writeText(text);
+}
 
 // zhihuScript.ts
 function zhihuScript(url) {
   const _url = new URL(url);
+  function backup(e) {
+    const rochTextDom = e.target
+      .closest("div.Card.TopstoryItem")
+      ?.querySelector("span.RichText");
+    if (rochTextDom) {
+      const md = htmlToMd(rochTextDom);
+      const title = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem-title meta[itemprop="name"]')
+        ?.getAttribute("content");
+      const titleUrl = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem-title meta[itemprop="url"]')
+        ?.getAttribute("content");
+      const url2 = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="url"]')
+        ?.getAttribute("content");
+      const dateCreated = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="dateCreated"]')
+        ?.getAttribute("content");
+      const dateModified = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="dateModified"]')
+        ?.getAttribute("content");
+      const upvoteCount = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="upvoteCount"]')
+        ?.getAttribute("content");
+      const commentCount = rochTextDom
+        .closest("div.Card.TopstoryItem")
+        ?.querySelector('.ContentItem > meta[itemprop="commentCount"]')
+        ?.getAttribute("content");
+      const metaMd = [
+        title && titleUrl && `# [${title}](${titleUrl})`,
+        dateCreated && `- 创建时间：${new Date(dateCreated).toLocaleString()}`,
+        dateModified &&
+          `- 修改时间：${new Date(dateModified).toLocaleString()}`,
+        upvoteCount && `- 赞同：${upvoteCount}`,
+        commentCount && `- 评论：${commentCount}`,
+        url2 && `- 链接：[${url2}](${url2})`,
+        `
+
+`,
+      ];
+      const _md =
+        metaMd.filter((i) => Boolean(i)).join(`
+`) + md;
+      devLog(`md
+
+${_md}`);
+      writeText(_md).then(() => {
+        alert(`${displayName}
+
+✅复制节点成功`);
+      });
+    } else {
+      devLog("e.target", e.target);
+      alert(`${displayName}
+
+❌获取节点失败`);
+    }
+  }
   switch (_url.pathname) {
     case "/":
     case "/follow":
-      const posts = document.querySelectorAll(".Card.TopstoryItem");
+      const posts = document.querySelectorAll(
+        ".RichContent:not(.is-collapsed)"
+      );
       posts.forEach((post) => {
         const content = post.querySelector(".ContentItem-actions");
-        if (content && content?.innerHTML && !content.innerHTML.includes(DownloadIcon)) {
-          const className = content.querySelector("button.ContentItem-action")?.className;
-          const btn = `
-            <button aria-live="polite" type="button" class="${className}" style="display: flex; align-items: center;">
-              <span style="display: inline-flex; align-items: center; margin-right: 4px">
-                ${DownloadIcon}
-              </span>${name.split("-").map((i) => `${i[0].toUpperCase()}${i.slice(1)}`).join(" ")}
-            </button>`;
-          content.innerHTML = content.innerHTML += btn;
+        if (content && !content.innerHTML.includes(`${name}--btn`)) {
+          const btn = document.createElement("button");
+          btn.className = `${name}--btn`;
+          btn.style.flex = "1";
+          btn.style.display = "flex";
+          btn.style.justifyContent = "flex-end";
+          btn.style.alignItems = "center";
+          btn.innerHTML = `${svgIcon} ${displayName}`;
+          btn.onclick = backup;
+          content.appendChild(btn);
         }
       });
       break;
@@ -133,6 +1114,12 @@ function initScript(url) {
 window.addEventListener("load", (event) => {
   devLog("window load");
   initScript(location.href);
+  window.addEventListener("click", () => {
+    devLog("window click");
+    setTimeout(() => {
+      initScript(location.href);
+    }, 500);
+  });
   window.addEventListener("urlchange", (info) => {
     devLog("urlchange", info);
     const url = new URL(info.url);
