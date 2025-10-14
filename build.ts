@@ -1,7 +1,6 @@
 import { exec } from "node:child_process";
-import { rm, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import process from "node:process";
-import { mkdir } from "fs-extra";
 import prolog from "@qzda/prolog";
 import { name } from "./package.json";
 import { UserScriptConfig } from "./config";
@@ -76,11 +75,7 @@ async function buildUserScript() {
     recursive: true,
   });
   const buildFilePath = `${userScriptBuildPath}/${name}.user.js`;
-  await writeFile(
-    buildFilePath,
-    Buffer.from(userScriptLines.join("\n")),
-    "utf8"
-  );
+  await writeFile(buildFilePath, userScriptLines.join("\n"), "utf8");
   console.log(`📦  Bundled\t=> ${prolog.cyan(buildFilePath)}`);
 
   console.log();

@@ -15,13 +15,9 @@
     "post"
   ],
   "dependencies": {
-    "@qzda/prolog": "latest",
-    "fs-extra": "^11.2.0",
-    "masonry-layout": "^4.2.2",
-    "node-cmd": "^5.0.0"
+    "@qzda/prolog": "latest"
   },
   "devDependencies": {
-    "@types/fs-extra": "^v11.0.4",
-    "@types/masonry-layout": "^v4.2.8"
+    "@types/tampermonkey": "latest"
   }
 }

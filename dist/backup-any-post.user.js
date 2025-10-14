@@ -3,7 +3,7 @@
 // @description 
 // @author qzda
 // @version 0.0.1
-// @match https://www.zhihu.com/*
+// @match *://*/*
 // @namespace https://github.com/qzda/backup-any-post/
 // @supportURL https://github.com/qzda/backup-any-post/issues/new
 // @downloadURL https://raw.githubusercontent.com/qzda/backup-any-post/main/dist/backup-any-post.user.js
@@ -30,6 +30,7 @@ var Colors = {
   magenta: 35,
   cyan: 36,
   white: 37,
+  gray: 90,
   brightBlack: 90,
   brightRed: 91,
   brightGreen: 92,
@@ -48,6 +49,7 @@ var Backgrounds = {
   bgMagenta: 45,
   bgCyan: 46,
   bgWhite: 47,
+  bgGray: 100,
   bgBrightBlack: 100,
   bgBrightRed: 101,
   bgBrightGreen: 102,
@@ -79,7 +81,7 @@ var name = "backup-any-post";
 var version = "0.0.1";
 
 // ../utils/dev.ts
-var isDev = true;
+var isDev = false;
 
 // ../utils/log.ts
 function log(...arg) {
@@ -89,14 +91,6 @@ function devLog(...arg) {
   if (isDev) {
     log(...arg);
   }
-}
-
-// initMenuCommand.ts
-function initMenuCommand() {
-  GM_registerMenuCommand("Menu1", function(event) {}, {
-    autoClose: false
-  });
-  devLog("initMenuCommand");
 }
 
 // ../assets/svg.ts
@@ -130,7 +124,6 @@ function zhihuScript(url) {
 
 // index.ts
 log();
-initMenuCommand();
 function initScript(url) {
   devLog("url", url);
   if (url.startsWith("https://www.zhihu.com")) {

@@ -1,5 +1,4 @@
-import { removeElementById } from "./element.ts";
-import { name } from '../package.json'
+import { name } from "../package.json";
 
 export function addStyles(id: string, css: string) {
   const styleID = `${name}-${id}`;
@@ -23,5 +22,5 @@ export function addStyles(id: string, css: string) {
 export function removeStyles(id: string) {
   const styleID = `${name}-${id}`;
 
-  removeElementById(styleID);
+  document.getElementById(styleID)?.remove();
 }

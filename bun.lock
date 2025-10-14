@@ -1,0 +1,19 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "backup-any-post",
+      "dependencies": {
+        "@qzda/prolog": "latest",
+      },
+      "devDependencies": {
+        "@types/tampermonkey": "latest",
+      },
+    },
+  },
+  "packages": {
+    "@qzda/prolog": ["@qzda/prolog@1.0.6", "", {}, "sha512-B6jMk7qAMAI5n/5S3P+jKXgfWS7IE6JDIj0c/PF8ceeSCwglfq2PV11OtNI5MSqPHpGmKdk4Bc3wVxw+Z8BQtA=="],
+
+    "@types/tampermonkey": ["@types/tampermonkey@5.0.4", "", {}, "sha512-HEJ0O5CkDZSwIgd9Zip4xM8o7gZC8zBmJuH1YEXNINIC+aCWEXD10pnpo3NQG5IWHx+Xr4fMSGq1jqeKXH2lpA=="],
+  }
+}
