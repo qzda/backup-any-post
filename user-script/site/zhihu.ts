@@ -1,9 +1,9 @@
-import { svgIcon } from "../assets/svg";
-import { name, displayName } from "../package.json";
-import { devLog } from "../utils/log";
-import { htmlToMd, writeText } from "../utils/backup";
+import { svgIcon } from "../../assets/svg";
+import { name, displayName } from "../../package.json";
+import { devLog } from "../../utils/log";
+import { downloadMd, htmlToMd, writeText } from "../../utils/backup";
 
-export function zhihuScript(url: string) {
+export default function zhihu(url: string) {
   const _url = new URL(url);
 
   function backup(e: PointerEvent) {
@@ -19,7 +19,7 @@ export function zhihuScript(url: string) {
         .closest<HTMLDivElement>("div.Card.TopstoryItem")
         ?.querySelector('.ContentItem-title meta[itemprop="name"]')
         ?.getAttribute("content");
-      const titleUrl = rochTextDom
+      const questionUrl = rochTextDom
         .closest<HTMLDivElement>("div.Card.TopstoryItem")
         ?.querySelector('.ContentItem-title meta[itemprop="url"]')
         ?.getAttribute("content");
@@ -48,19 +48,22 @@ export function zhihuScript(url: string) {
         ?.getAttribute("content");
 
       const metaMd = [
-        title && titleUrl && `# [${title}](${titleUrl})`,
-        dateCreated && `- 创建时间：${new Date(dateCreated).toLocaleString()}`,
-        dateModified &&
-          `- 修改时间：${new Date(dateModified).toLocaleString()}`,
-        upvoteCount && `- 赞同：${upvoteCount}`,
-        commentCount && `- 评论：${commentCount}`,
-        url && `- 链接：[${url}](${url})`,
-        "\n\n",
+        "---",
+        title && `title: ${title}`,
+        questionUrl && `questionUrl: ${questionUrl}`,
+        dateCreated && `dateCreated: ${dateCreated}`,
+        dateModified && `dateModified: ${dateModified}`,
+        upvoteCount && `upvoteCount: ${upvoteCount}`,
+        commentCount && `commentCount: ${commentCount}`,
+        url && `url: ${url}`,
+        "---\n\n",
       ];
 
       const _md = metaMd.filter((i) => Boolean(i)).join("\n") + md;
 
       devLog(`md\n\n${_md}`);
+
+      downloadMd(_md, `backup-zhihu-${title || Date.now()}.md`);
 
       writeText(_md).then(() => {
         alert(`${displayName} \n\n✅复制节点成功`);
@@ -85,9 +88,7 @@ export function zhihuScript(url: string) {
         if (content && !content.innerHTML.includes(`${name}--btn`)) {
           const btn = document.createElement("button");
           btn.className = `${name}--btn`;
-          btn.style.flex = "1";
           btn.style.display = "flex";
-          btn.style.justifyContent = "flex-end";
           btn.style.alignItems = "center";
 
           btn.innerHTML = `${svgIcon} ${displayName}`;

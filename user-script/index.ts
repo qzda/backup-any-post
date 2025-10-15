@@ -1,6 +1,6 @@
 import { devLog, log } from "../utils/log";
 // import { initMenuCommand } from "./initMenuCommand";
-import { zhihuScript } from "./zhihuScript";
+import zhihu from "./site/zhihu";
 
 log();
 // initMenuCommand();
@@ -9,7 +9,7 @@ function initScript(url: string) {
   devLog("url", url);
 
   if (url.startsWith("https://www.zhihu.com")) {
-    zhihuScript(url);
+    zhihu(url);
   }
 }
 
