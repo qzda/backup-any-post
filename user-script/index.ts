@@ -1,4 +1,5 @@
 import { devLog, log } from "../utils/log";
+import twitter from "./site/twitter";
 // import { initMenuCommand } from "./initMenuCommand";
 import zhihu from "./site/zhihu";
 
@@ -8,6 +9,10 @@ log();
 function initScript(url: string) {
   if (url.startsWith("https://www.zhihu.com")) {
     zhihu(url);
+  }
+
+  if (url.startsWith("https://x.com/home")) {
+    twitter(url);
   }
 }
 
