@@ -64,12 +64,12 @@ export default function zhihu(url: string) {
         ".RichContent:not(.is-collapsed)"
       );
       posts.forEach((post) => {
-        const content = post.querySelector<HTMLDivElement>(
+        const btnContainer = post.querySelector<HTMLDivElement>(
           ".ContentItem-actions"
         );
         // '.RichContent:not(.is-collapsed)'
-        if (content) {
-          if (!content.innerHTML.includes(`${name}--btn`)) {
+        if (btnContainer) {
+          if (!btnContainer.innerHTML.includes(`${name}--btn`)) {
             const btn = document.createElement("button");
             btn.className = `${name}--btn`;
             btn.style.display = "flex";
@@ -78,7 +78,7 @@ export default function zhihu(url: string) {
             btn.innerHTML = `${svgIcon} ${displayName}`;
 
             btn.onclick = backup;
-            content.appendChild(btn);
+            btnContainer.appendChild(btn);
           }
         } else {
           devLogError("添加按钮失败");
