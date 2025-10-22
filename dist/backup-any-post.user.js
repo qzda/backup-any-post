@@ -87,9 +87,17 @@ var isDev = false;
 function log(...arg) {
   console.log(dist_default.bgBlack(dist_default.brightYellow(`${name} v${version}`)), ...arg);
 }
+function logError(...arg) {
+  console.log(dist_default.bgRed(`${name} ${version}`), ...arg);
+}
 function devLog(...arg) {
   if (isDev) {
     log(...arg);
+  }
+}
+function devLogError(...arg) {
+  if (isDev) {
+    logError(...arg);
   }
 }
 
@@ -874,42 +882,49 @@ function htmlToMd(dom) {
 ${md}`);
   return md;
 }
-function writeText(text) {
+function clipboardWriteText(text) {
   return navigator.clipboard.writeText(text);
 }
-function downloadMd(md, filename = `${name}--${Date.now()}`) {
+function safeFilename(input) {
+  const filename = input.replace(/[^\u4e00-\u9fa5a-zA-Z0-9 _\-'"？?]/g, "_");
+  devLog(`md filename`, filename);
+  return filename;
+}
+function downloadMd(md, filename) {
   const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename;
+  a.download = safeFilename(filename);
   a.click();
   URL.revokeObjectURL(url);
 }
 
 // site/zhihu.ts
 function zhihu(url) {
+  devLog("zhihu");
   const _url = new URL(url);
   function backup(e) {
     const rochTextDom = e.target.closest("div.Card.TopstoryItem")?.querySelector("span.RichText");
     if (rochTextDom) {
       const md = htmlToMd(rochTextDom);
-      const title = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem-title meta[itemprop="name"]')?.getAttribute("content");
-      const questionUrl = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem-title meta[itemprop="url"]')?.getAttribute("content");
-      const url2 = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem > meta[itemprop="url"]')?.getAttribute("content");
-      const dateCreated = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem > meta[itemprop="dateCreated"]')?.getAttribute("content");
-      const dateModified = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem > meta[itemprop="dateModified"]')?.getAttribute("content");
-      const upvoteCount = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem > meta[itemprop="upvoteCount"]')?.getAttribute("content");
-      const commentCount = rochTextDom.closest("div.Card.TopstoryItem")?.querySelector('.ContentItem > meta[itemprop="commentCount"]')?.getAttribute("content");
+      const postDom = rochTextDom.closest("div.Card.TopstoryItem");
+      const meta = [];
+      if (postDom) {
+        meta.push([
+          "title",
+          postDom.querySelector(".ContentItem-title [data-za-detail-view-element_name]")?.textContent
+        ]);
+        postDom.querySelectorAll(".ContentItem > meta[itemprop]").forEach((m) => {
+          const name2 = m.getAttribute("itemprop");
+          if (name2) {
+            meta.push([name2, m.getAttribute("content")]);
+          }
+        });
+      }
       const metaMd = [
         "---",
-        title && `title: ${title}`,
-        questionUrl && `questionUrl: ${questionUrl}`,
-        dateCreated && `dateCreated: ${dateCreated}`,
-        dateModified && `dateModified: ${dateModified}`,
-        upvoteCount && `upvoteCount: ${upvoteCount}`,
-        commentCount && `commentCount: ${commentCount}`,
-        url2 && `url: ${url2}`,
+        ...meta.map(([key, value]) => `${key}: ${value}`),
         `---
 
 `
@@ -919,8 +934,8 @@ function zhihu(url) {
       devLog(`md
 
 ${_md}`);
-      downloadMd(_md, `backup-zhihu-${title || Date.now()}.md`);
-      writeText(_md).then(() => {
+      downloadMd(_md, String(meta[0][1] || Date.now()));
+      clipboardWriteText(_md).then(() => {
         alert(`${displayName} 
 
 ✅复制节点成功`);
@@ -938,14 +953,18 @@ ${_md}`);
       const posts = document.querySelectorAll(".RichContent:not(.is-collapsed)");
       posts.forEach((post) => {
         const content = post.querySelector(".ContentItem-actions");
-        if (content && !content.innerHTML.includes(`${name}--btn`)) {
-          const btn = document.createElement("button");
-          btn.className = `${name}--btn`;
-          btn.style.display = "flex";
-          btn.style.alignItems = "center";
-          btn.innerHTML = `${svgIcon} ${displayName}`;
-          btn.onclick = backup;
-          content.appendChild(btn);
+        if (content) {
+          if (!content.innerHTML.includes(`${name}--btn`)) {
+            const btn = document.createElement("button");
+            btn.className = `${name}--btn`;
+            btn.style.display = "flex";
+            btn.style.alignItems = "center";
+            btn.innerHTML = `${svgIcon} ${displayName}`;
+            btn.onclick = backup;
+            content.appendChild(btn);
+          }
+        } else {
+          devLogError("添加按钮失败");
         }
       });
       break;
@@ -957,7 +976,6 @@ ${_md}`);
 // index.ts
 log();
 function initScript(url) {
-  devLog("url", url);
   if (url.startsWith("https://www.zhihu.com")) {
     zhihu(url);
   }
@@ -966,14 +984,18 @@ window.addEventListener("load", (event) => {
   devLog("window load");
   initScript(location.href);
   window.addEventListener("click", () => {
-    devLog("window click");
     setTimeout(() => {
       initScript(location.href);
-    }, 500);
+    }, 300);
   });
-  window.addEventListener("urlchange", (info) => {
-    devLog("urlchange", info);
-    const url = new URL(info.url);
-    initScript(url.href);
+  let scrollFlag = true;
+  window.addEventListener("scroll", () => {
+    if (scrollFlag) {
+      scrollFlag = false;
+      setTimeout(() => {
+        initScript(location.href);
+        scrollFlag = true;
+      }, 500);
+    }
   });
 });

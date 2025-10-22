@@ -10,17 +10,23 @@ export function htmlToMd(dom: HTMLElement) {
   return md;
 }
 
-export function writeText(text: string) {
+export function clipboardWriteText(text: string) {
   return navigator.clipboard.writeText(text);
 }
 
-export function downloadMd(md: string, filename = `${name}--${Date.now()}`) {
+export function safeFilename(input: string) {
+  const filename = input.replace(/[^\u4e00-\u9fa5a-zA-Z0-9 _\-'"？?]/g, "_");
+  devLog(`md filename`, filename);
+  return filename;
+}
+
+export function downloadMd(md: string, filename: string) {
   const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename;
+  a.download = safeFilename(filename);
   a.click();
 
   URL.revokeObjectURL(url);

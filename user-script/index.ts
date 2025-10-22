@@ -6,8 +6,6 @@ log();
 // initMenuCommand();
 
 function initScript(url: string) {
-  devLog("url", url);
-
   if (url.startsWith("https://www.zhihu.com")) {
     zhihu(url);
   }
@@ -19,15 +17,19 @@ window.addEventListener("load", (event) => {
   initScript(location.href);
 
   window.addEventListener("click", () => {
-    devLog("window click");
     setTimeout(() => {
       initScript(location.href);
-    }, 500);
+    }, 300);
   });
 
-  window.addEventListener("urlchange", (info: any) => {
-    devLog("urlchange", info);
-    const url = new URL(info.url as string);
-    initScript(url.href);
+  let scrollFlag = true;
+  window.addEventListener("scroll", () => {
+    if (scrollFlag) {
+      scrollFlag = false;
+      setTimeout(() => {
+        initScript(location.href);
+        scrollFlag = true;
+      }, 500);
+    }
   });
 });

@@ -1,9 +1,10 @@
 import { svgIcon } from "../../assets/svg";
 import { name, displayName } from "../../package.json";
-import { devLog } from "../../utils/log";
-import { downloadMd, htmlToMd, writeText } from "../../utils/backup";
+import { devLog, devLogError } from "../../utils/log";
+import { downloadMd, htmlToMd, clipboardWriteText } from "../../utils/backup";
 
 export default function zhihu(url: string) {
+  devLog("zhihu");
   const _url = new URL(url);
 
   function backup(e: PointerEvent) {
@@ -14,58 +15,40 @@ export default function zhihu(url: string) {
     if (rochTextDom) {
       const md = htmlToMd(rochTextDom);
 
+      const postDom = rochTextDom.closest<HTMLDivElement>(
+        "div.Card.TopstoryItem"
+      );
+      const meta: [string, string | undefined | null][] = [];
       /// 获取 文章mata
-      const title = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem-title meta[itemprop="name"]')
-        ?.getAttribute("content");
-      const questionUrl = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem-title meta[itemprop="url"]')
-        ?.getAttribute("content");
-      // <meta itemprop="url" content="https://www.zhihu.com/question/questionID/answer/answerID">
-      const url = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem > meta[itemprop="url"]')
-        ?.getAttribute("content");
-      // 2025-10-11T13:21:31.000Z
-      const dateCreated = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem > meta[itemprop="dateCreated"]')
-        ?.getAttribute("content");
-      // 2025-10-11T13:21:31.000Z
-      const dateModified = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem > meta[itemprop="dateModified"]')
-        ?.getAttribute("content");
-      const upvoteCount = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem > meta[itemprop="upvoteCount"]')
-        ?.getAttribute("content");
-      const commentCount = rochTextDom
-        .closest<HTMLDivElement>("div.Card.TopstoryItem")
-        ?.querySelector('.ContentItem > meta[itemprop="commentCount"]')
-        ?.getAttribute("content");
+      if (postDom) {
+        meta.push([
+          "title",
+          postDom.querySelector(
+            ".ContentItem-title [data-za-detail-view-element_name]"
+          )?.textContent,
+        ]);
+
+        postDom
+          .querySelectorAll<HTMLMetaElement>(".ContentItem > meta[itemprop]")
+          .forEach((m) => {
+            const name = m.getAttribute("itemprop");
+
+            if (name) {
+              meta.push([name, m.getAttribute("content")]);
+            }
+          });
+      }
 
       const metaMd = [
         "---",
-        title && `title: ${title}`,
-        questionUrl && `questionUrl: ${questionUrl}`,
-        dateCreated && `dateCreated: ${dateCreated}`,
-        dateModified && `dateModified: ${dateModified}`,
-        upvoteCount && `upvoteCount: ${upvoteCount}`,
-        commentCount && `commentCount: ${commentCount}`,
-        url && `url: ${url}`,
+        ...meta.map(([key, value]) => `${key}: ${value}`),
         "---\n\n",
       ];
 
       const _md = metaMd.filter((i) => Boolean(i)).join("\n") + md;
-
       devLog(`md\n\n${_md}`);
-
-      downloadMd(_md, `backup-zhihu-${title || Date.now()}.md`);
-
-      writeText(_md).then(() => {
+      downloadMd(_md, String(meta[0][1] || Date.now()));
+      clipboardWriteText(_md).then(() => {
         alert(`${displayName} \n\n✅复制节点成功`);
       });
     } else {
@@ -85,16 +68,20 @@ export default function zhihu(url: string) {
           ".ContentItem-actions"
         );
         // '.RichContent:not(.is-collapsed)'
-        if (content && !content.innerHTML.includes(`${name}--btn`)) {
-          const btn = document.createElement("button");
-          btn.className = `${name}--btn`;
-          btn.style.display = "flex";
-          btn.style.alignItems = "center";
+        if (content) {
+          if (!content.innerHTML.includes(`${name}--btn`)) {
+            const btn = document.createElement("button");
+            btn.className = `${name}--btn`;
+            btn.style.display = "flex";
+            btn.style.alignItems = "center";
 
-          btn.innerHTML = `${svgIcon} ${displayName}`;
+            btn.innerHTML = `${svgIcon} ${displayName}`;
 
-          btn.onclick = backup;
-          content.appendChild(btn);
+            btn.onclick = backup;
+            content.appendChild(btn);
+          }
+        } else {
+          devLogError("添加按钮失败");
         }
       });
       break;
